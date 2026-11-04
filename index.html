@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Калькулятор срока увольнения по собственному желанию по Трудовому кодексу РК: когда истекает срок уведомления и до какого дня работодатель должен рассчитаться.">
+  <title>Последний день — калькулятор увольнения</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#calc">К калькулятору</a>
+
+  <header class="top">
+    <div class="wrap top__inner">
+      <a class="logo" href="#calc" aria-label="Последний день — в начало">
+        <span class="logo__mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22"><rect x="3" y="5" width="18" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="m9 15 2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        Последний день
+      </a>
+      <nav class="nav" aria-label="Разделы">
+        <a href="#calc">Калькулятор</a>
+        <a href="#rules">Как считается</a>
+        <a href="#earlier">Можно ли раньше</a>
+        <a href="#get">Что получить</a>
+        <a href="#sources">Источники</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- 1. Калькулятор -->
+    <section id="calc" class="hero">
+      <div class="wrap">
+        <p class="eyebrow">Увольнение по собственному желанию · Казахстан</p>
+        <h1>Когда ваш последний день и&nbsp;когда должны рассчитаться</h1>
+        <p class="lead">Укажите дату, когда вы подали работодателю письменное уведомление. Калькулятор посчитает сроки по Трудовому кодексу РК.</p>
+
+        <div class="card calc">
+          <form id="form" class="form" novalidate>
+            <div class="field">
+              <label for="notice">Дата подачи уведомления</label>
+              <input id="notice" name="notice" type="date" required aria-describedby="notice-hint">
+              <p class="hint" id="notice-hint">День, когда работодатель получил ваше заявление.</p>
+            </div>
+            <div class="field">
+              <label for="months">Срок уведомления</label>
+              <select id="months" name="months" aria-describedby="months-hint">
+                <option value="1" selected>1 месяц — по закону</option>
+                <option value="2">2 месяца — по договору</option>
+                <option value="3">3 месяца — по договору</option>
+                <option value="4">4 месяца — по договору</option>
+                <option value="5">5 месяцев — по договору</option>
+                <option value="6">6 месяцев — по договору</option>
+              </select>
+              <p class="hint" id="months-hint">Больше месяца — только если так записано в вашем трудовом договоре.</p>
+            </div>
+            <button class="btn" type="submit">Рассчитать</button>
+          </form>
+
+          <div id="result" class="result" aria-live="polite"></div>
+        </div>
+
+        <p class="assume">
+          <strong>Считаем для пятидневки</strong> (выходные — суббота и воскресенье) с праздниками РК.
+          Переносы выходных, которые отдельно утверждает госорган по труду, не учтены — сверьтесь с производственным календарём.
+        </p>
+      </div>
+    </section>
+
+    <!-- 2. Как считается срок -->
+    <section id="rules" class="section">
+      <div class="wrap">
+        <h2>Как считается срок</h2>
+        <p class="section__lead">Работник может уволиться по своей инициативе, предупредив работодателя не менее чем за один месяц. В трудовом договоре срок может быть длиннее <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z56" target="_blank" rel="noopener">ст. 56 п. 1 ТК РК</a>.</p>
+
+        <ol class="steps">
+          <li>
+            <h3>Отсчёт начинается на следующий день</h3>
+            <p>День подачи уведомления не считается. Отсчёт идёт со следующего календарного дня. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z13" target="_blank" rel="noopener">ст. 13 п. 3</a></p>
+          </li>
+          <li>
+            <h3>Месяц — это то же число следующего месяца</h3>
+            <p>Срок истекает в то же число через месяц. Если такого числа нет (например, 31-го в июне), то в последний день месяца. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z13" target="_blank" rel="noopener">ст. 13 п. 4</a></p>
+          </li>
+          <li>
+            <h3>Выходной сдвигает срок вперёд</h3>
+            <p>Если последний день выпал на выходной или праздник, срок заканчивается в первый следующий рабочий день. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z13" target="_blank" rel="noopener">ст. 13 п. 5</a></p>
+          </li>
+        </ol>
+
+        <h3 class="sub">Примеры <span class="muted">(люди и ситуации вымышлены)</span></h3>
+        <div class="examples">
+          <article class="example">
+            <p class="example__who">Айгерим, бариста</p>
+            <p>Подала уведомление в&nbsp;четверг, 5&nbsp;ноября 2026. Через месяц — 5&nbsp;декабря, но это суббота. Срок истекает в&nbsp;понедельник, <b>7&nbsp;декабря</b>. Расчёт — не позднее <b>10&nbsp;декабря</b>.</p>
+            <button class="link" type="button" data-try="2026-11-05" data-months="1">Посчитать этот пример</button>
+          </article>
+          <article class="example">
+            <p class="example__who">Алина, продавец-консультант</p>
+            <p>Подала уведомление 16&nbsp;ноября 2026. Через месяц — 16&nbsp;декабря, День Независимости. Срок истекает <b>17&nbsp;декабря</b>, расчёт — не позднее <b>22&nbsp;декабря</b>.</p>
+            <button class="link" type="button" data-try="2026-11-16" data-months="1">Посчитать этот пример</button>
+          </article>
+          <article class="example">
+            <p class="example__who">Данияр, курьер</p>
+            <p>Отправил уведомление 31&nbsp;января 2027. В&nbsp;феврале нет 31-го, поэтому срок — 28&nbsp;февраля, а это воскресенье. Срок истекает <b>1&nbsp;марта</b>, расчёт — не позднее <b>4&nbsp;марта</b>.</p>
+            <button class="link" type="button" data-try="2027-01-31" data-months="1">Посчитать этот пример</button>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Можно ли раньше -->
+    <section id="earlier" class="section section--alt">
+      <div class="wrap">
+        <h2>Можно ли уйти раньше или передумать</h2>
+        <div class="grid">
+          <article class="card info">
+            <h3>Раньше — с согласия работодателя</h3>
+            <p>Договор можно расторгнуть до окончания срока уведомления, если работодатель письменно согласен. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z56" target="_blank" rel="noopener">ст. 56 п. 2</a></p>
+          </article>
+          <article class="card info">
+            <h3>Передумали — можно отозвать</h3>
+            <p>Пока срок уведомления не истёк, работник вправе отозвать уведомление. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z56" target="_blank" rel="noopener">ст. 56 п. 4</a></p>
+          </article>
+          <article class="card info">
+            <h3>Работодатель нарушает договор</h3>
+            <p>Сначала нужно уведомить работодателя о нарушении. Если через 7&nbsp;рабочих дней нарушение продолжается, можно расторгнуть договор, предупредив не позднее чем за 3&nbsp;рабочих дня. Этот случай калькулятор не считает. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z56" target="_blank" rel="noopener">ст. 56 п. 3</a></p>
+          </article>
+          <article class="card info">
+            <h3>Материально ответственным</h3>
+            <p>Если вы отвечаете за имущество или документы работодателя, днём расторжения считается день, когда завершена их приёмка-передача. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z56" target="_blank" rel="noopener">ст. 56 п. 5</a></p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Что получить при увольнении -->
+    <section id="get" class="section">
+      <div class="wrap">
+        <h2>Что получить при увольнении</h2>
+        <ul class="checklist">
+          <li>
+            <h3>Все причитающиеся деньги</h3>
+            <p>Не позднее трёх рабочих дней после прекращения договора. За задержку работодатель платит ещё и пеню. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z113" target="_blank" rel="noopener">ст. 113 п. 4</a></p>
+          </li>
+          <li>
+            <h3>Компенсацию за неиспользованный отпуск</h3>
+            <p>Если вы не отгуляли отпуск полностью, выплачивается компенсация. Она считается из средней заработной платы. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z96" target="_blank" rel="noopener">ст. 96 п. 2</a></p>
+          </li>
+          <li>
+            <h3>Документ о трудовой деятельности</h3>
+            <p>Выдаётся в день прекращения трудового договора. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z62" target="_blank" rel="noopener">ст. 62 п. 1</a></p>
+          </li>
+          <li>
+            <h3>Копию приказа об увольнении</h3>
+            <p>Вручают или отправляют заказным письмом в течение трёх рабочих дней со дня издания приказа. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z61" target="_blank" rel="noopener">ст. 61 п. 3</a></p>
+          </li>
+          <li>
+            <h3>Справку с места работы — по запросу</h3>
+            <p>С должностью, временем работы и размером зарплаты — в течение пяти рабочих дней после обращения. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z62" target="_blank" rel="noopener">ст. 62 п. 2</a></p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 5. Источники и оговорка -->
+    <section id="sources" class="section section--alt">
+      <div class="wrap">
+        <h2>Источники и оговорка</h2>
+        <div class="card disclaimer" role="note">
+          <p><strong>Это справочная информация, а не юридическая консультация.</strong> Сайт не учитывает условия вашего договора, графика работы и особые ситуации. В спорном случае обратитесь к юристу или в инспекцию труда.</p>
+          <p>Содержание проверено на <time datetime="2026-11-05">5 ноября 2026 года</time>.</p>
+        </div>
+        <ul class="sources">
+          <li><a href="https://adilet.zan.kz/rus/docs/K1500000414" target="_blank" rel="noopener">Трудовой кодекс Республики Казахстан от 23.11.2015 № 414-V</a> — ст. 13, 56, 61, 62, 84, 85, 96, 113.</li>
+          <li><a href="https://adilet.zan.kz/rus/docs/Z010000267_" target="_blank" rel="noopener">Закон РК «О праздниках в Республике Казахстан» от 13.12.2001 № 267</a> — ст. 2, 3, 5 (в ред. Закона от 11.06.2026 № 306-VIII: с 01.07.2026 День Конституции — 15 марта).</li>
+          <li>Дата первого дня Курбан-айта в 2027 году (16 мая) — по календарю Духовного управления мусульман Казахстана; может сместиться на один день.</li>
+        </ul>
+        <p class="muted small">Тексты нормативных актов — ИПС «Әділет» Министерства юстиции РК. Ничего из введённого вами не сохраняется и никуда не отправляется: расчёт выполняется в вашем браузере.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap">
+      <p>«Последний день» — учебный проект. Все примеры вымышлены.</p>
+    </div>
+  </footer>
+
+  <script src="calc.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
