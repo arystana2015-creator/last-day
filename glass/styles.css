@@ -240,3 +240,10 @@ a { color: var(--accent); text-underline-offset: 3px; }
 @media (forced-colors: active) {
   .top, .calc, .rules, .example, .cases, .docs, .disclaimer, .sources { border-color: CanvasText; }
 }
+
+/* Срок уведомления: месяцы + дни */
+.period { border: 0; padding: 0; margin: 0; min-width: 0; }
+.period legend { padding: 0; margin-bottom: 6px; font-weight: 650; }
+.period__row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.field .period__item { display: flex; align-items: center; gap: 8px; margin: 0; font-weight: 400; }
+.period__item input { flex: 1; min-width: 0; }

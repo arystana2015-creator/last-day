@@ -39,18 +39,14 @@
               <input id="notice" name="notice" type="date" required aria-describedby="notice-hint">
               <p class="hint" id="notice-hint">День, когда работодатель получил ваше заявление.</p>
             </div>
-            <div class="field">
-              <label for="months">Срок уведомления</label>
-              <select id="months" name="months" aria-describedby="months-hint">
-                <option value="1" selected>1 месяц — по закону</option>
-                <option value="2">2 месяца — по договору</option>
-                <option value="3">3 месяца — по договору</option>
-                <option value="4">4 месяца — по договору</option>
-                <option value="5">5 месяцев — по договору</option>
-                <option value="6">6 месяцев — по договору</option>
-              </select>
-              <p class="hint" id="months-hint">Больше месяца — только если так записано в вашем трудовом договоре.</p>
-            </div>
+            <fieldset class="field period">
+              <legend>Срок уведомления</legend>
+              <div class="period__row">
+                <label class="period__item"><input id="months" name="months" type="number" inputmode="numeric" min="0" max="24" step="1" value="1" aria-describedby="months-hint"><span>месяцев</span></label>
+                <label class="period__item"><input id="days" name="days" type="number" inputmode="numeric" min="0" max="730" step="1" value="0" aria-describedby="months-hint"><span>дней</span></label>
+              </div>
+              <p class="hint" id="months-hint">По закону — не менее 1 месяца. Если в трудовом договоре срок длиннее (например, 2 месяца или 1 месяц и 15 дней), укажите его.</p>
+            </fieldset>
             <button class="btn" type="submit">Рассчитать</button>
           </form>
 

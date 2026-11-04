@@ -16,11 +16,26 @@
   function ref(anchor, text) { return ' <a class="ref" href="' + TK + '#' + anchor + '" target="_blank" rel="noopener">' + text + '</a>'; }
   // «Суббота» → «суббота», «День Победы» → «день Победы»: только первая буква, имена собственные не трогаем
   function lowerFirst(s) { return s.charAt(0).toLowerCase() + s.slice(1); }
-  function monthsWord(n) { return n === 1 ? 'месяц' : (n < 5 ? 'месяца' : 'месяцев'); }
+  function plural(n, one, few, many) {
+    var a = n % 10, b = n % 100;
+    if (a === 1 && b !== 11) return one;
+    if (a >= 2 && a <= 4 && (b < 12 || b > 14)) return few;
+    return many;
+  }
+  // «1 месяц», «2 месяца и 10 дней», «45 дней»
+  function periodText(m, d) {
+    var parts = [];
+    if (m) parts.push(m + ' ' + plural(m, 'месяц', 'месяца', 'месяцев'));
+    if (d) parts.push(d + ' ' + plural(d, 'день', 'дня', 'дней'));
+    return parts.join(' и ');
+  }
+  // Пустое поле — 0; иначе число (дробь или текст дадут ошибку в calc.js)
+  function toCount(v) { v = String(v).trim(); return v === '' ? 0 : Number(v); }
 
   var form = document.getElementById('form');
   var notice = document.getElementById('notice');
   var months = document.getElementById('months');
+  var days = document.getElementById('days');
   var out = document.getElementById('result');
 
   // Допустимый период ввода — тот, на который заведён календарь праздников.
@@ -32,7 +47,8 @@
 
   var ERRORS = {
     'invalid-date': 'Укажите дату подачи уведомления.',
-    'invalid-months': 'Выберите срок уведомления от 1 до 6 месяцев.',
+    'invalid-period': 'Укажите срок целыми числами: месяцев от 0 до 24, дней от 0 до 730, хотя бы одно значение больше нуля.',
+    'too-short': 'По закону работник предупреждает работодателя не менее чем за один месяц (ст. 56 п. 1 ТК РК). Более короткий срок — только в особом случае из п. 3 этой статьи, его калькулятор не считает.',
     'before-calendar': 'Калькулятор считает даты начиная с 1 июля 2026 года: с этого дня действует новый список праздников.',
     'after-calendar': 'Результат выходит за 31 декабря 2027 года, а календарь праздников заведён только до этой даты. Сверьтесь с производственным календарём.'
   };
@@ -62,14 +78,17 @@
       notes.push('<li class="note note--warn">' + short(r.noticeDate) + ' — нерабочий день (' + esc(lowerFirst(r.noticeOnDayOff)) +
         '). Срок считается от даты, когда работодатель фактически получил уведомление.</li>');
     }
+    if (r.months !== 1 || r.days !== 0) {
+      notes.push('<li class="note">Срок по вашему трудовому договору — ' + periodText(r.months, r.days) +
+        '. Договор может установить срок длиннее месяца, но не короче.' + ref('z56', 'ст. 56 п. 1') +
+        (r.days ? ' Дни считаются календарные, вместе с выходными.' + ref('z13', 'ст. 13 п. 4') : '') + '</li>');
+    }
     if (r.endShifted.length) {
       var why = r.endShifted.map(function (s) { return short(s.date) + ' — ' + esc(lowerFirst(s.reason)); }).join('; ');
-      notes.push('<li class="note">Через ' + r.months + ' ' + monthsWord(r.months) + ' получилось ' + short(r.nominalEnd) +
+      notes.push('<li class="note">Через ' + periodText(r.months, r.days) + ' получилось ' + short(r.nominalEnd) +
         ', но это нерабочий день, поэтому срок переносится на первый рабочий день (' + why + ').' + ref('z13', 'ст. 13 п. 5') + '</li>');
-    } else if (r.nominalEnd.slice(8, 10) !== r.noticeDate.slice(8, 10)) {
-      notes.push('<li class="note">В нужном месяце нет ' + +r.noticeDate.slice(8, 10) + '-го числа, поэтому срок истекает в последний день месяца.' + ref('z13', 'ст. 13 п. 4') + '</li>');
     }
-    if (r.endShifted.length && r.nominalEnd.slice(8, 10) !== r.noticeDate.slice(8, 10)) {
+    if (r.noSuchDay) {
       notes.push('<li class="note">В нужном месяце нет ' + +r.noticeDate.slice(8, 10) + '-го числа, поэтому отсчёт идёт от последнего дня месяца.' + ref('z13', 'ст. 13 п. 4') + '</li>');
     }
     if (r.paymentDaysOff.length) {
@@ -81,7 +100,7 @@
     out.innerHTML = html + '<ul class="notes" style="--i:3">' + notes.join('') + '</ul>';
   }
 
-  function run() { render(C.calculate(notice.value, +months.value)); }
+  function run() { render(C.calculate(notice.value, toCount(months.value), toCount(days.value))); }
 
   form.addEventListener('submit', function (e) { e.preventDefault(); run(); });
 
@@ -90,6 +109,7 @@
     b.addEventListener('click', function () {
       notice.value = b.getAttribute('data-try');
       months.value = b.getAttribute('data-months') || '1';
+      days.value = '0';
       run();
       document.getElementById('calc').scrollIntoView();
       notice.focus({ preventScroll: true });

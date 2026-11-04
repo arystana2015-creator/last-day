@@ -183,3 +183,10 @@ a { color: var(--accent); text-underline-offset: 3px; }
 .sources li { margin-bottom: 8px; padding-left: .2em; }
 .foot { padding: 24px 0 48px; color: var(--muted); font-size: .875rem; border-top: 1px solid var(--line); }
 .foot p { margin: 0; }
+
+/* Срок уведомления: месяцы + дни */
+.period { border: 0; padding: 0; margin: 0; min-width: 0; }
+.period legend { padding: 0; margin-bottom: 6px; font-weight: 700; }
+.period__row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.field .period__item { display: flex; align-items: center; gap: 8px; margin: 0; font-weight: 400; }
+.period__item input { flex: 1; min-width: 0; }

@@ -100,18 +100,28 @@
     return d;
   }
 
+  var MAX_MONTHS = 24, MAX_DAYS = 730;
+  function isCount(n, max) { return typeof n === 'number' && isFinite(n) && Math.floor(n) === n && n >= 0 && n <= max; }
+
   /**
    * Главный расчёт.
    * @param {string} noticeDate дата подачи уведомления "ГГГГ-ММ-ДД"
-   * @param {number} months срок уведомления в месяцах (1–6)
+   * @param {number} months месяцев в сроке уведомления (0–24)
+   * @param {number} [days] дополнительных календарных дней (0–730), по умолчанию 0
+   * Срок вида «N месяцев и M дней»: сначала месяцы (ст. 13 п. 4), затем календарные дни,
+   * в которые включаются и нерабочие дни (ст. 13 п. 4, последнее предложение).
    */
-  function calculate(noticeDate, months) {
+  function calculate(noticeDate, months, days) {
     months = Number(months);
+    days = days === undefined || days === '' ? 0 : Number(days);
     if (parse(noticeDate) === null) return { ok: false, error: 'invalid-date' };
-    if (!(months >= 1 && months <= 6 && Math.floor(months) === months)) return { ok: false, error: 'invalid-months' };
+    if (!isCount(months, MAX_MONTHS) || !isCount(days, MAX_DAYS) || months + days === 0) return { ok: false, error: 'invalid-period' };
     if (noticeDate < CALENDAR_FROM) return { ok: false, error: 'before-calendar' };
 
-    var nominalEnd = addMonths(noticeDate, months);             // ст. 13 пп. 3–4
+    var afterMonths = addMonths(noticeDate, months);            // ст. 13 пп. 3–4
+    var nominalEnd = addDays(afterMonths, days);
+    // ст. 56 п. 1: не менее чем за один месяц — более короткий срок калькулятор не считает
+    if (nominalEnd < addMonths(noticeDate, 1)) return { ok: false, error: 'too-short' };
     var noticeEnd = nextWorkingDayFrom(nominalEnd);              // ст. 13 п. 5
     var paymentDeadline = addWorkingDays(noticeEnd, 3);          // ст. 113 п. 4
     if (paymentDeadline > CALENDAR_TO) return { ok: false, error: 'after-calendar' };
@@ -127,6 +137,8 @@
       ok: true,
       noticeDate: noticeDate,
       months: months,
+      days: days,
+      noSuchDay: months > 0 && afterMonths.slice(8, 10) !== noticeDate.slice(8, 10),
       noticeOnDayOff: dayOffReason(noticeDate),
       countStart: addDays(noticeDate, 1),
       nominalEnd: nominalEnd,
@@ -143,6 +155,8 @@
     isWorkingDay: isWorkingDay,
     dayOffReason: dayOffReason,
     weekday: weekday,
+    MAX_MONTHS: MAX_MONTHS,
+    MAX_DAYS: MAX_DAYS,
     CALENDAR_FROM: CALENDAR_FROM,
     CALENDAR_TO: CALENDAR_TO,
     CHECKED_ON: CHECKED_ON
