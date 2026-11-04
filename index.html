@@ -6,15 +6,15 @@
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="Калькулятор срока увольнения по собственному желанию по Трудовому кодексу РК: когда истекает срок уведомления и до какого дня работодатель должен рассчитаться.">
   <title>Последний день — калькулятор увольнения</title>
-  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
+  <div class="bg" aria-hidden="true"></div>
   <a class="skip" href="#calc">К калькулятору</a>
 
   <header class="top">
     <div class="top__inner">
       <a class="logo" href="#calc" aria-label="Последний день — в начало">Последний день</a>
-      <a class="ver" href="glass/"><span class="ver__k">Версия:</span> Стекло</a>
       <nav class="nav" aria-label="Разделы">
         <a href="#calc">Калькулятор</a>
         <a href="#rules">Как считается</a>
@@ -41,11 +41,17 @@
             </div>
             <fieldset class="field period">
               <legend>Срок уведомления</legend>
-              <div class="period__row">
+              <div class="chips">
+                <label class="chip"><input type="radio" name="preset" value="1" checked><span>1 месяц <small>по закону</small></span></label>
+                <label class="chip"><input type="radio" name="preset" value="2"><span>2 месяца</span></label>
+                <label class="chip"><input type="radio" name="preset" value="3"><span>3 месяца</span></label>
+                <label class="chip"><input type="radio" name="preset" value="custom" aria-controls="custom-period"><span>Свой срок</span></label>
+              </div>
+              <div class="period__row" id="custom-period" hidden>
                 <label class="period__item"><input id="months" name="months" type="number" inputmode="numeric" min="0" max="24" step="1" value="1" aria-describedby="months-hint"><span>месяцев</span></label>
                 <label class="period__item"><input id="days" name="days" type="number" inputmode="numeric" min="0" max="730" step="1" value="0" aria-describedby="months-hint"><span>дней</span></label>
               </div>
-              <p class="hint" id="months-hint">По закону — не менее 1 месяца. Если в трудовом договоре срок длиннее (например, 2 месяца или 1 месяц и 15 дней), укажите его.</p>
+              <p class="hint" id="months-hint">По закону — не менее 1 месяца. Если в трудовом договоре срок длиннее, выберите его или укажите свой — например, 1 месяц и 15 дней.</p>
             </fieldset>
             <button class="btn" type="submit">Рассчитать</button>
           </form>
@@ -180,7 +186,7 @@
     </div>
   </footer>
 
-  <script src="calc.js?v=3"></script>
-  <script src="app.js?v=3"></script>
+  <script src="calc.js?v=4"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>

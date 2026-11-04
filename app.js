@@ -37,6 +37,32 @@
   var months = document.getElementById('months');
   var days = document.getElementById('days');
   var out = document.getElementById('result');
+  var presets = form.querySelectorAll('input[name="preset"]');
+  var customRow = document.getElementById('custom-period');
+
+  // Кнопки срока: 1, 2, 3 месяца — подставляют значение; «Свой срок» открывает поля месяцев и дней
+  function selectedPreset() {
+    for (var i = 0; i < presets.length; i++) if (presets[i].checked) return presets[i].value;
+    return '1';
+  }
+  function applyPreset(focusCustom) {
+    var v = selectedPreset();
+    if (v === 'custom') {
+      customRow.hidden = false;
+      if (focusCustom) months.focus();
+    } else {
+      customRow.hidden = true;
+      months.value = v;
+      days.value = '0';
+    }
+  }
+  Array.prototype.forEach.call(presets, function (p) {
+    p.addEventListener('change', function () {
+      applyPreset(true);
+      if (out.innerHTML && selectedPreset() !== 'custom') run(); // результат уже показан — пересчитать сразу
+    });
+  });
+  applyPreset(false);
 
   // Допустимый период ввода — тот, на который заведён календарь праздников.
   notice.min = C.CALENDAR_FROM;
@@ -108,8 +134,8 @@
   Array.prototype.forEach.call(document.querySelectorAll('[data-try]'), function (b) {
     b.addEventListener('click', function () {
       notice.value = b.getAttribute('data-try');
-      months.value = b.getAttribute('data-months') || '1';
-      days.value = '0';
+      presets[0].checked = true; // примеры — по закону, 1 месяц
+      applyPreset(false);
       run();
       document.getElementById('calc').scrollIntoView();
       notice.focus({ preventScroll: true });

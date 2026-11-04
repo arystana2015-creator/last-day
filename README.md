@@ -8,6 +8,4 @@
 
 Справочная информация, не заменяет консультацию юриста. Содержание проверено на 05.11.2026.
 
-Две версии оформления:
-- классическая — https://arystana2015-creator.github.io/last-day/
-- «Стекло» — https://arystana2015-creator.github.io/last-day/glass/
+Сайт: https://arystana2015-creator.github.io/last-day/
