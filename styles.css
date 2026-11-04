@@ -17,9 +17,11 @@
   --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
   --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --measure: 40rem;
+  color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root {
+    color-scheme: dark;
     --bg: #1b1815;          /* тёплый графит, не чёрный */
     --surface: #24201c;
     --tint: #2b2621;
@@ -96,6 +98,7 @@ a { color: var(--accent); text-underline-offset: 3px; }
   border: 1px solid var(--line-strong); border-radius: 2px;
 }
 .field input:focus-visible, .field select:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+.field select option { background: var(--surface); color: var(--text); }
 .hint { color: var(--muted); font-size: .875rem; margin: 6px 0 0; }
 .btn {
   min-height: 48px; padding: 0 28px; border: 0; border-radius: 2px; cursor: pointer;
