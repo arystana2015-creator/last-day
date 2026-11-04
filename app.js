@@ -43,15 +43,15 @@
       return;
     }
     var html = '<ol class="timeline">' +
-      '<li class="tl"><span class="tl__dot" aria-hidden="true"></span>' +
+      '<li class="tl" style="--i:0"><span class="tl__mark" aria-hidden="true"></span>' +
         '<p class="tl__label">Вы подали уведомление</p>' +
         '<p class="tl__date">' + fmt(r.noticeDate) + '</p>' +
         '<p class="tl__note">Отсчёт срока — со следующего дня, ' + short(r.countStart) + '.' + ref('z13', 'ст. 13 п. 3') + '</p></li>' +
-      '<li class="tl tl--main"><span class="tl__dot" aria-hidden="true"></span>' +
-        '<p class="tl__label">Срок уведомления истекает</p>' +
+      '<li class="tl tl--main" style="--i:1"><span class="tl__mark" aria-hidden="true"></span>' +
+        '<p class="tl__label">Последний день: срок уведомления истекает</p>' +
         '<p class="tl__date">' + fmt(r.noticeEnd) + '</p>' +
         '<p class="tl__note">С этого дня вы вправе прекратить работу; в день прекращения договора выдаётся документ о трудовой деятельности. До этого дня уведомление можно отозвать.' + ref('z56', 'ст. 56 пп. 4–5') + ref('z62', 'ст. 62') + '</p></li>' +
-      '<li class="tl"><span class="tl__dot" aria-hidden="true"></span>' +
+      '<li class="tl" style="--i:2"><span class="tl__mark" aria-hidden="true"></span>' +
         '<p class="tl__label">Окончательный расчёт — не позднее</p>' +
         '<p class="tl__date">' + fmt(r.paymentDeadline) + '</p>' +
         '<p class="tl__note">Три рабочих дня после прекращения договора. За задержку положена пеня.' + ref('z113', 'ст. 113 п. 4') + '</p></li>' +
@@ -78,7 +78,7 @@
     }
     notes.push('<li class="note">Мы считаем, что договор прекращается в день окончания срока уведомления. Точную дату укажет приказ работодателя.</li>');
 
-    out.innerHTML = html + '<ul class="notes">' + notes.join('') + '</ul>';
+    out.innerHTML = html + '<ul class="notes" style="--i:3">' + notes.join('') + '</ul>';
   }
 
   function run() { render(C.calculate(notice.value, +months.value)); }
