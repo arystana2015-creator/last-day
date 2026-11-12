@@ -394,32 +394,4 @@
     }, { rootMargin: '0px 0px -8% 0px' });
     Array.prototype.forEach.call(targets, function (el) { el.classList.add('reveal'); io.observe(el); });
   }
-
-  /* ---------- Скриншоты промптов ----------
-     Чтобы показать скриншот: положите img/prompts/N.png и добавьте номер N в список.
-     Пока список пуст, браузер не запрашивает несуществующие файлы. */
-  var SHOTS = [];
-  SHOTS.forEach(function (n) {
-    var img = document.querySelector('img[data-src="img/prompts/' + n + '.png"]');
-    if (!img) return;
-    img.src = img.getAttribute('data-src');
-    img.closest('.shot').hidden = false;
-  });
-
-  /* ---------- Лайтбокс скриншотов ---------- */
-  var dlg = document.getElementById('lightbox');
-  var lbImg = document.getElementById('lb-img');
-  if (dlg && typeof dlg.showModal === 'function') {
-    Array.prototype.forEach.call(document.querySelectorAll('.shot'), function (b) {
-      b.addEventListener('click', function () {
-        var img = b.querySelector('img');
-        lbImg.src = img.currentSrc || img.src;
-        lbImg.alt = img.alt;
-        dlg.showModal();
-      });
-    });
-    document.getElementById('lb-close').addEventListener('click', function () { dlg.close(); });
-    // Клик вне картинки (по затемнению) закрывает окно; Esc закрывает штатно
-    dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
-  }
 })();
