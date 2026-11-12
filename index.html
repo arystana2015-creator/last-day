@@ -4,24 +4,43 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="Калькулятор срока увольнения по собственному желанию по Трудовому кодексу РК: когда истекает срок уведомления и до какого дня работодатель должен рассчитаться.">
+  <meta name="description" content="Калькулятор срока увольнения по собственному желанию по Трудовому кодексу РК: последний день, когда подать уведомление, деньги и документы, что делать при невыплате.">
   <title>Последний день — калькулятор увольнения</title>
-  <link rel="stylesheet" href="styles.css?v=4">
+  <!-- Тема применяется до отрисовки, чтобы не было вспышки -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('ld-theme');
+        if (t === 'light' || t === 'dark') {
+          document.documentElement.setAttribute('data-theme', t);
+          document.querySelector('meta[name="color-scheme"]').setAttribute('content', t);
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body>
-  <div class="bg" aria-hidden="true"></div>
+  <!-- Фоновые пятна под стеклом -->
+  <div class="bg" aria-hidden="true"><i class="blob blob--1"></i><i class="blob blob--2"></i><i class="blob blob--3"></i><i class="blob blob--4"></i></div>
   <a class="skip" href="#calc">К калькулятору</a>
 
   <header class="top">
     <div class="top__inner">
       <a class="logo" href="#calc" aria-label="Последний день — в начало">Последний день</a>
-      <nav class="nav" aria-label="Разделы">
+      <nav class="nav" id="nav" aria-label="Разделы">
         <a href="#calc">Калькулятор</a>
-        <a href="#rules">Как считается</a>
-        <a href="#earlier">Можно ли раньше</a>
-        <a href="#get">Что получить</a>
+        <a href="#explain">Разъяснения</a>
+        <a href="#how">Как сделан сайт</a>
         <a href="#sources">Источники</a>
+        <a href="#contacts">Контакты</a>
       </nav>
+      <button class="theme" id="theme" type="button" aria-label="Тема оформления: авто">
+        <svg class="theme__ic theme__ic--auto" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg>
+        <svg class="theme__ic theme__ic--light" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <svg class="theme__ic theme__ic--dark" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.2 8.2 0 1 0 10.2 10.2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <span class="theme__txt" id="theme-txt">Авто</span>
+      </button>
     </div>
   </header>
 
@@ -30,33 +49,114 @@
     <section id="calc" class="hero">
       <div class="wrap">
         <h1>Когда ваш последний день и&nbsp;когда должны рассчитаться</h1>
-        <p class="lead">Увольнение по собственному желанию в Казахстане. Укажите дату подачи письменного уведомления — калькулятор посчитает сроки по Трудовому кодексу РК.</p>
+        <p class="lead">Увольнение по собственному желанию в Казахстане. Выберите, что посчитать, — калькулятор применит сроки Трудового кодекса РК.</p>
 
-        <div class="calc">
-          <form id="form" class="form" novalidate>
-            <div class="field">
-              <label for="notice">Дата подачи уведомления</label>
-              <input id="notice" name="notice" type="date" required aria-describedby="notice-hint">
-              <p class="hint" id="notice-hint">День, когда работодатель получил ваше заявление.</p>
+        <div class="calc glass">
+          <p class="calc__title" id="calc-title">Что посчитать</p>
+          <div class="tabs" role="tablist" aria-labelledby="calc-title" id="tabs">
+            <span class="tabs__pill" id="pill" aria-hidden="true"></span>
+            <button class="tab" role="tab" type="button" id="tab-last" aria-controls="panel-last" aria-selected="true">Последний день</button>
+            <button class="tab" role="tab" type="button" id="tab-when" aria-controls="panel-when" aria-selected="false" tabindex="-1">Когда подать</button>
+            <button class="tab" role="tab" type="button" id="tab-docs" aria-controls="panel-docs" aria-selected="false" tabindex="-1">Деньги и документы</button>
+            <button class="tab" role="tab" type="button" id="tab-unpaid" aria-controls="panel-unpaid" aria-selected="false" tabindex="-1">Если не заплатили</button>
+          </div>
+          <noscript><p class="error">Для калькулятора нужен включённый JavaScript.</p></noscript>
+
+          <div class="panels">
+            <!-- Режим 1: последний день -->
+            <div class="panel" role="tabpanel" id="panel-last" aria-labelledby="tab-last" data-mode="last">
+              <p class="panel__lead">Укажите дату подачи письменного уведомления — получите последний день работы и срок окончательного расчёта.</p>
+              <form class="form" novalidate>
+                <div class="field">
+                  <label for="notice">Дата подачи уведомления</label>
+                  <input id="notice" type="date" required aria-describedby="notice-hint">
+                  <p class="hint" id="notice-hint">День, когда работодатель получил ваше заявление.</p>
+                </div>
+                <fieldset class="field period" data-period>
+                  <legend>Срок уведомления</legend>
+                  <div class="chips">
+                    <label class="chip"><input type="radio" name="presetA" value="1" checked><span>1 месяц <small>по закону</small></span></label>
+                    <label class="chip"><input type="radio" name="presetA" value="2"><span>2 месяца</span></label>
+                    <label class="chip"><input type="radio" name="presetA" value="3"><span>3 месяца</span></label>
+                    <label class="chip"><input type="radio" name="presetA" value="custom" aria-controls="customA"><span>Свой срок</span></label>
+                  </div>
+                  <div class="period__row" id="customA" hidden>
+                    <label class="period__item"><input data-f="months" type="number" inputmode="numeric" min="0" max="24" step="1" value="1" aria-describedby="hintA"><span>месяцев</span></label>
+                    <label class="period__item"><input data-f="days" type="number" inputmode="numeric" min="0" max="730" step="1" value="0" aria-describedby="hintA"><span>дней</span></label>
+                  </div>
+                  <p class="hint" id="hintA">По закону — не менее 1 месяца. Если в трудовом договоре срок длиннее, выберите его или укажите свой — например, 1 месяц и 15 дней.</p>
+                </fieldset>
+                <button class="btn" type="submit">Рассчитать</button>
+              </form>
+              <div class="result" aria-live="polite"></div>
             </div>
-            <fieldset class="field period">
-              <legend>Срок уведомления</legend>
-              <div class="chips">
-                <label class="chip"><input type="radio" name="preset" value="1" checked><span>1 месяц <small>по закону</small></span></label>
-                <label class="chip"><input type="radio" name="preset" value="2"><span>2 месяца</span></label>
-                <label class="chip"><input type="radio" name="preset" value="3"><span>3 месяца</span></label>
-                <label class="chip"><input type="radio" name="preset" value="custom" aria-controls="custom-period"><span>Свой срок</span></label>
-              </div>
-              <div class="period__row" id="custom-period" hidden>
-                <label class="period__item"><input id="months" name="months" type="number" inputmode="numeric" min="0" max="24" step="1" value="1" aria-describedby="months-hint"><span>месяцев</span></label>
-                <label class="period__item"><input id="days" name="days" type="number" inputmode="numeric" min="0" max="730" step="1" value="0" aria-describedby="months-hint"><span>дней</span></label>
-              </div>
-              <p class="hint" id="months-hint">По закону — не менее 1 месяца. Если в трудовом договоре срок длиннее, выберите его или укажите свой — например, 1 месяц и 15 дней.</p>
-            </fieldset>
-            <button class="btn" type="submit">Рассчитать</button>
-          </form>
 
-          <div id="result" class="result" aria-live="polite"></div>
+            <!-- Режим 2: когда подать -->
+            <div class="panel" role="tabpanel" id="panel-when" aria-labelledby="tab-when" data-mode="when" hidden>
+              <p class="panel__lead">Укажите, в какой день хотите уйти, — узнайте, когда самое позднее нужно подать уведомление.</p>
+              <form class="form" novalidate>
+                <div class="field">
+                  <label for="want">Желаемый последний день</label>
+                  <input id="want" type="date" required aria-describedby="want-hint">
+                  <p class="hint" id="want-hint">День, когда вы хотите закончить работать.</p>
+                </div>
+                <fieldset class="field period" data-period>
+                  <legend>Срок уведомления</legend>
+                  <div class="chips">
+                    <label class="chip"><input type="radio" name="presetB" value="1" checked><span>1 месяц <small>по закону</small></span></label>
+                    <label class="chip"><input type="radio" name="presetB" value="2"><span>2 месяца</span></label>
+                    <label class="chip"><input type="radio" name="presetB" value="3"><span>3 месяца</span></label>
+                    <label class="chip"><input type="radio" name="presetB" value="custom" aria-controls="customB"><span>Свой срок</span></label>
+                  </div>
+                  <div class="period__row" id="customB" hidden>
+                    <label class="period__item"><input data-f="months" type="number" inputmode="numeric" min="0" max="24" step="1" value="1" aria-describedby="hintB"><span>месяцев</span></label>
+                    <label class="period__item"><input data-f="days" type="number" inputmode="numeric" min="0" max="730" step="1" value="0" aria-describedby="hintB"><span>дней</span></label>
+                  </div>
+                  <p class="hint" id="hintB">По закону — не менее 1 месяца. Если в трудовом договоре срок длиннее, выберите его или укажите свой.</p>
+                </fieldset>
+                <button class="btn" type="submit">Рассчитать</button>
+              </form>
+              <div class="result" aria-live="polite"></div>
+            </div>
+
+            <!-- Режим 3: деньги и документы -->
+            <div class="panel" role="tabpanel" id="panel-docs" aria-labelledby="tab-docs" data-mode="docs" hidden>
+              <p class="panel__lead">Укажите день прекращения договора — получите сроки выплат и документов.</p>
+              <form class="form" novalidate>
+                <div class="field">
+                  <label for="term">Последний день (прекращение договора)</label>
+                  <input id="term" type="date" required aria-describedby="term-hint">
+                  <p class="hint" id="term-hint">День, когда трудовой договор прекращается.</p>
+                </div>
+                <div class="field">
+                  <label for="req">Дата запроса справки <span class="opt">необязательно</span></label>
+                  <input id="req" type="date" aria-describedby="req-hint">
+                  <p class="hint" id="req-hint">Если не указать, считаем, что справку попросили в день прекращения.</p>
+                </div>
+                <button class="btn" type="submit">Рассчитать</button>
+              </form>
+              <div class="result" aria-live="polite"></div>
+            </div>
+
+            <!-- Режим 4: если не заплатили -->
+            <div class="panel" role="tabpanel" id="panel-unpaid" aria-labelledby="tab-unpaid" data-mode="unpaid" hidden>
+              <p class="panel__lead">Укажите день прекращения договора и сегодняшнюю дату — узнайте, есть ли просрочка и до какого дня можно обратиться.</p>
+              <form class="form" novalidate>
+                <div class="field">
+                  <label for="uterm">Последний день (прекращение договора)</label>
+                  <input id="uterm" type="date" required aria-describedby="uterm-hint">
+                  <p class="hint" id="uterm-hint">День, когда трудовой договор прекратился.</p>
+                </div>
+                <div class="field">
+                  <label for="utoday">Сегодня</label>
+                  <input id="utoday" type="date" required aria-describedby="utoday-hint">
+                  <p class="hint" id="utoday-hint">По умолчанию — текущая дата; можно поставить любую.</p>
+                </div>
+                <button class="btn" type="submit">Рассчитать</button>
+              </form>
+              <div class="result" aria-live="polite"></div>
+            </div>
+          </div>
         </div>
 
         <p class="assume">
@@ -66,116 +166,211 @@
       </div>
     </section>
 
-    <!-- 2. Как считается срок -->
-    <section id="rules" class="section">
+    <!-- 2. Разъяснения -->
+    <section id="explain" class="section">
       <div class="wrap">
-        <h2>Как считается срок</h2>
-        <p class="section__lead">Работник может уволиться по своей инициативе, предупредив работодателя не менее чем за один месяц. В трудовом договоре срок может быть длиннее <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z56" target="_blank" rel="noopener">ст. 56 п. 1 ТК РК</a>.</p>
+        <h2>Разъяснения</h2>
 
-        <ol class="rules">
-          <li>
-            <h3>Отсчёт начинается на следующий день</h3>
-            <p>День подачи уведомления не считается. Отсчёт идёт со следующего календарного дня. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z13" target="_blank" rel="noopener">ст. 13 п. 3</a></p>
-          </li>
-          <li>
-            <h3>Месяц — это то же число следующего месяца</h3>
-            <p>Срок истекает в то же число через месяц. Если такого числа нет (например, 31-го в июне), то в последний день месяца. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z13" target="_blank" rel="noopener">ст. 13 п. 4</a></p>
-          </li>
-          <li>
-            <h3>Выходной сдвигает срок вперёд</h3>
-            <p>Если последний день выпал на выходной или праздник, срок заканчивается в первый следующий рабочий день. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z13" target="_blank" rel="noopener">ст. 13 п. 5</a></p>
-          </li>
-        </ol>
+        <details class="fold glass" open>
+          <summary>Как считается срок</summary>
+          <div class="fold__body">
+            <p>Работник может уволиться по своей инициативе, предупредив работодателя не менее чем за один месяц. В трудовом договоре срок может быть длиннее <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z56" target="_blank" rel="noopener">ст. 56 п. 1 ТК РК</a>.</p>
 
-        <h3 class="sub">Примеры <span class="muted">(люди и ситуации вымышлены)</span></h3>
-        <div class="examples">
-          <article class="example">
-            <p class="example__who">Айгерим, бариста</p>
-            <p>Подала уведомление в&nbsp;четверг, 5&nbsp;ноября 2026. Через месяц — 5&nbsp;декабря, но это суббота. Срок истекает в&nbsp;понедельник, <b>7&nbsp;декабря</b>. Расчёт — не позднее <b>10&nbsp;декабря</b>.</p>
-            <button class="link" type="button" data-try="2026-11-05" data-months="1">Посчитать этот пример</button>
+            <ol class="rules">
+              <li>
+                <h3>Отсчёт начинается на следующий день</h3>
+                <p>День подачи уведомления не считается. Отсчёт идёт со следующего календарного дня. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z13" target="_blank" rel="noopener">ст. 13 п. 3</a></p>
+              </li>
+              <li>
+                <h3>Месяц — это то же число следующего месяца</h3>
+                <p>Срок истекает в то же число через месяц. Если такого числа нет (например, 31-го в июне), то в последний день месяца. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z13" target="_blank" rel="noopener">ст. 13 п. 4</a></p>
+              </li>
+              <li>
+                <h3>Выходной сдвигает срок вперёд</h3>
+                <p>Если последний день выпал на выходной или праздник, срок заканчивается в первый следующий рабочий день. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z13" target="_blank" rel="noopener">ст. 13 п. 5</a></p>
+              </li>
+            </ol>
+
+            <h3 class="sub">Примеры <span class="muted">(люди и ситуации вымышлены)</span></h3>
+            <div class="examples">
+              <article class="example">
+                <p class="example__who">Айгерим, бариста</p>
+                <p>Подала уведомление в&nbsp;четверг, 5&nbsp;ноября 2026. Через месяц — 5&nbsp;декабря, но это суббота. Срок истекает в&nbsp;понедельник, <b>7&nbsp;декабря</b>. Расчёт — не позднее <b>10&nbsp;декабря</b>.</p>
+                <button class="link" type="button" data-try="2026-11-05" data-months="1">Посчитать этот пример</button>
+              </article>
+              <article class="example">
+                <p class="example__who">Алина, продавец-консультант</p>
+                <p>Подала уведомление 16&nbsp;ноября 2026. Через месяц — 16&nbsp;декабря, День Независимости. Срок истекает <b>17&nbsp;декабря</b>, расчёт — не позднее <b>22&nbsp;декабря</b>.</p>
+                <button class="link" type="button" data-try="2026-11-16" data-months="1">Посчитать этот пример</button>
+              </article>
+              <article class="example">
+                <p class="example__who">Данияр, курьер</p>
+                <p>Отправил уведомление 31&nbsp;января 2027. В&nbsp;феврале нет 31-го, поэтому срок — 28&nbsp;февраля, а это воскресенье. Срок истекает <b>1&nbsp;марта</b>, расчёт — не позднее <b>4&nbsp;марта</b>.</p>
+                <button class="link" type="button" data-try="2027-01-31" data-months="1">Посчитать этот пример</button>
+              </article>
+            </div>
+          </div>
+        </details>
+
+        <details class="fold glass">
+          <summary>Можно ли уйти раньше или передумать</summary>
+          <div class="fold__body">
+            <dl class="cases">
+              <div>
+                <dt>Раньше — с согласия работодателя</dt>
+                <dd>Договор можно расторгнуть до окончания срока уведомления, если работодатель письменно согласен. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z56" target="_blank" rel="noopener">ст. 56 п. 2</a></dd>
+              </div>
+              <div>
+                <dt>Передумали — можно отозвать</dt>
+                <dd>Пока срок уведомления не истёк, работник вправе отозвать уведомление. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z56" target="_blank" rel="noopener">ст. 56 п. 4</a></dd>
+              </div>
+              <div>
+                <dt>Работодатель нарушает договор</dt>
+                <dd>Сначала нужно уведомить работодателя о нарушении. Если через 7&nbsp;рабочих дней нарушение продолжается, можно расторгнуть договор, предупредив не позднее чем за 3&nbsp;рабочих дня. Этот случай калькулятор не считает. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z56" target="_blank" rel="noopener">ст. 56 п. 3</a></dd>
+              </div>
+              <div>
+                <dt>Материально ответственным</dt>
+                <dd>Если вы отвечаете за имущество или документы работодателя, днём расторжения считается день, когда завершена их приёмка-передача. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z56" target="_blank" rel="noopener">ст. 56 п. 5</a></dd>
+              </div>
+            </dl>
+          </div>
+        </details>
+
+        <details class="fold glass">
+          <summary>Что получить при увольнении</summary>
+          <div class="fold__body">
+            <ul class="docs">
+              <li>
+                <h3>Все причитающиеся деньги</h3>
+                <p>Не позднее трёх рабочих дней после прекращения договора. За задержку работодатель платит ещё и пеню. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z113" target="_blank" rel="noopener">ст. 113 п. 4</a></p>
+              </li>
+              <li>
+                <h3>Компенсацию за неиспользованный отпуск</h3>
+                <p>Если вы не отгуляли отпуск полностью, выплачивается компенсация. Она считается из средней заработной платы. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z96" target="_blank" rel="noopener">ст. 96 п. 2</a></p>
+              </li>
+              <li>
+                <h3>Документ о трудовой деятельности</h3>
+                <p>Выдаётся в день прекращения трудового договора. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z62" target="_blank" rel="noopener">ст. 62 п. 1</a></p>
+              </li>
+              <li>
+                <h3>Копию приказа об увольнении</h3>
+                <p>Вручают или отправляют заказным письмом в течение трёх рабочих дней со дня издания приказа. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z61" target="_blank" rel="noopener">ст. 61 п. 3</a></p>
+              </li>
+              <li>
+                <h3>Справку с места работы — по запросу</h3>
+                <p>С должностью, временем работы и размером зарплаты — в течение пяти рабочих дней после обращения. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z62" target="_blank" rel="noopener">ст. 62 п. 2</a></p>
+              </li>
+            </ul>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- 3. Как сделан сайт -->
+    <section id="how" class="section">
+      <div class="wrap wrap--wide">
+        <h2>Как сделан сайт</h2>
+        <p class="section__lead">Сайт сделан с помощью ИИ-инструмента Claude Code. Ниже — реальные запросы автора по этапам: что просили, что сделал ИИ, что проверили вручную.</p>
+
+        <div class="cards" tabindex="0" role="region" aria-label="Этапы работы над сайтом — лента карточек">
+          <article class="pcard glass">
+            <p class="pcard__n">Этап 1</p>
+            <h3>План проекта</h3>
+            <blockquote class="term"><span class="term__bar" aria-hidden="true"><i></i><i></i><i></i></span><p><span class="term__gt" aria-hidden="true">&gt;</span>Вот мой документ с заданием. Пойми, что требуется, построй полный план, раздели на этапы, как в документе, и выполни только то, что нужно сейчас. Используй Sonnet на высоком уровне рассуждений, потом сам проверь</p></blockquote>
+            <dl class="steps"><div><dt>ИИ сделал</dt><dd>план, 3 варианта темы, паспорт проекта.</dd></div><div><dt>Проверили</dt><dd>нормы ТК РК по первоисточнику на adilet.zan.kz.</dd></div></dl>
+            <button class="shot" type="button" hidden aria-label="Увеличить скриншот этапа 1"><img data-src="img/prompts/1.png" alt="Скриншот запроса к Claude Code: план проекта" loading="lazy"></button>
           </article>
-          <article class="example">
-            <p class="example__who">Алина, продавец-консультант</p>
-            <p>Подала уведомление 16&nbsp;ноября 2026. Через месяц — 16&nbsp;декабря, День Независимости. Срок истекает <b>17&nbsp;декабря</b>, расчёт — не позднее <b>22&nbsp;декабря</b>.</p>
-            <button class="link" type="button" data-try="2026-11-16" data-months="1">Посчитать этот пример</button>
+          <article class="pcard glass">
+            <p class="pcard__n">Этап 2</p>
+            <h3>Вопросы</h3>
+            <blockquote class="term"><span class="term__bar" aria-hidden="true"><i></i><i></i><i></i></span><p><span class="term__gt" aria-hidden="true">&gt;</span>Делаем калькулятор. Задай вопросы, чтобы понять мои идеи, и наводящие вопросы</p></blockquote>
+            <dl class="steps"><div><dt>ИИ сделал</dt><dd>анкету из 29 вопросов.</dd></div><div><dt>Проверили</dt><dd>полноту вопросов.</dd></div></dl>
+            <button class="shot" type="button" hidden aria-label="Увеличить скриншот этапа 2"><img data-src="img/prompts/2.png" alt="Скриншот запроса к Claude Code: вопросы по калькулятору" loading="lazy"></button>
           </article>
-          <article class="example">
-            <p class="example__who">Данияр, курьер</p>
-            <p>Отправил уведомление 31&nbsp;января 2027. В&nbsp;феврале нет 31-го, поэтому срок — 28&nbsp;февраля, а это воскресенье. Срок истекает <b>1&nbsp;марта</b>, расчёт — не позднее <b>4&nbsp;марта</b>.</p>
-            <button class="link" type="button" data-try="2027-01-31" data-months="1">Посчитать этот пример</button>
+          <article class="pcard glass">
+            <p class="pcard__n">Этап 3</p>
+            <h3>Сборка калькулятора</h3>
+            <blockquote class="term"><span class="term__bar" aria-hidden="true"><i></i><i></i><i></i></span><p><span class="term__gt" aria-hidden="true">&gt;</span>Давай без вопросов — сделай по калькулятору то, что нужно, сам</p></blockquote>
+            <dl class="steps"><div><dt>ИИ сделал</dt><dd>ТЗ, логику расчёта, сайт, автотесты.</dd></div><div><dt>Проверили</dt><dd>12 тестовых примеров вручную; найдено изменение закона о праздниках 2026 года.</dd></div></dl>
+            <button class="shot" type="button" hidden aria-label="Увеличить скриншот этапа 3"><img data-src="img/prompts/3.png" alt="Скриншот запроса к Claude Code: сборка калькулятора" loading="lazy"></button>
+          </article>
+          <article class="pcard glass">
+            <p class="pcard__n">Этап 4</p>
+            <h3>Дизайн</h3>
+            <blockquote class="term"><span class="term__bar" aria-hidden="true"><i></i><i></i><i></i></span><p><span class="term__gt" aria-hidden="true">&gt;</span>Сделай сайт менее похожим на сделанный ИИ, сбалансированные цвета, и люксовую версию в стиле Liquid Glass — спокойно, без ярких цветов</p></blockquote>
+            <dl class="steps"><div><dt>ИИ сделал</dt><dd>две версии оформления.</dd></div><div><dt>Проверили</dt><dd>контраст текста, тёмную тему, телефон.</dd></div></dl>
+            <button class="shot" type="button" hidden aria-label="Увеличить скриншот этапа 4"><img data-src="img/prompts/4.png" alt="Скриншот запроса к Claude Code: дизайн в стиле Liquid Glass" loading="lazy"></button>
+          </article>
+          <article class="pcard glass">
+            <p class="pcard__n">Этап 5</p>
+            <h3>Свой срок</h3>
+            <blockquote class="term"><span class="term__bar" aria-hidden="true"><i></i><i></i><i></i></span><p><span class="term__gt" aria-hidden="true">&gt;</span>По договору срок может быть больше или нестандартным — дай возможность самому вписать месяцы и дни</p></blockquote>
+            <dl class="steps"><div><dt>ИИ сделал</dt><dd>поля «месяцев» и «дней», проверку «не меньше месяца».</dd></div><div><dt>Проверили</dt><dd>новые автотесты.</dd></div></dl>
+            <button class="shot" type="button" hidden aria-label="Увеличить скриншот этапа 5"><img data-src="img/prompts/5.png" alt="Скриншот запроса к Claude Code: свой срок уведомления" loading="lazy"></button>
+          </article>
+          <article class="pcard glass">
+            <p class="pcard__n">Этап 6</p>
+            <h3>Кнопки и один дизайн</h3>
+            <blockquote class="term"><span class="term__bar" aria-hidden="true"><i></i><i></i><i></i></span><p><span class="term__gt" aria-hidden="true">&gt;</span>Нужен только один дизайн — Liquid Glass. И выбор срока кнопками или ввод своего</p></blockquote>
+            <dl class="steps"><div><dt>ИИ сделал</dt><dd>кнопки 1/2/3 месяца и «Свой срок».</dd></div><div><dt>Проверили</dt><dd>работу на опубликованном сайте.</dd></div></dl>
+            <button class="shot" type="button" hidden aria-label="Увеличить скриншот этапа 6"><img data-src="img/prompts/6.png" alt="Скриншот запроса к Claude Code: кнопки выбора срока и один дизайн" loading="lazy"></button>
+          </article>
+          <article class="pcard glass">
+            <p class="pcard__n">Этап 7</p>
+            <h3>Версия 2</h3>
+            <blockquote class="term"><span class="term__bar" aria-hidden="true"><i></i><i></i><i></i></span><p><span class="term__gt" aria-hidden="true">&gt;</span>Добавь тёмную/светлую тему, скрины промптов, контакты, motion-дизайн и другие расчёты по датам с плавным переключением. Сначала концепцию</p></blockquote>
+            <dl class="steps"><div><dt>ИИ сделал</dt><dd>концепцию, 4 режима калькулятора, анимации.</dd></div><div><dt>Проверили</dt><dd>нормы ст. 159–160 ТК РК, 38 автотестов.</dd></div></dl>
+            <button class="shot" type="button" hidden aria-label="Увеличить скриншот этапа 7"><img data-src="img/prompts/7.png" alt="Скриншот запроса к Claude Code: версия 2 сайта" loading="lazy"></button>
           </article>
         </div>
       </div>
     </section>
 
-    <!-- 3. Можно ли раньше -->
-    <section id="earlier" class="section">
-      <div class="wrap">
-        <h2>Можно ли уйти раньше или передумать</h2>
-        <dl class="cases">
-          <div>
-            <dt>Раньше — с согласия работодателя</dt>
-            <dd>Договор можно расторгнуть до окончания срока уведомления, если работодатель письменно согласен. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z56" target="_blank" rel="noopener">ст. 56 п. 2</a></dd>
-          </div>
-          <div>
-            <dt>Передумали — можно отозвать</dt>
-            <dd>Пока срок уведомления не истёк, работник вправе отозвать уведомление. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z56" target="_blank" rel="noopener">ст. 56 п. 4</a></dd>
-          </div>
-          <div>
-            <dt>Работодатель нарушает договор</dt>
-            <dd>Сначала нужно уведомить работодателя о нарушении. Если через 7&nbsp;рабочих дней нарушение продолжается, можно расторгнуть договор, предупредив не позднее чем за 3&nbsp;рабочих дня. Этот случай калькулятор не считает. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z56" target="_blank" rel="noopener">ст. 56 п. 3</a></dd>
-          </div>
-          <div>
-            <dt>Материально ответственным</dt>
-            <dd>Если вы отвечаете за имущество или документы работодателя, днём расторжения считается день, когда завершена их приёмка-передача. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z56" target="_blank" rel="noopener">ст. 56 п. 5</a></dd>
-          </div>
-        </dl>
-      </div>
-    </section>
-
-    <!-- 4. Что получить при увольнении -->
-    <section id="get" class="section">
-      <div class="wrap">
-        <h2>Что получить при увольнении</h2>
-        <ul class="docs">
-          <li>
-            <h3>Все причитающиеся деньги</h3>
-            <p>Не позднее трёх рабочих дней после прекращения договора. За задержку работодатель платит ещё и пеню. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z113" target="_blank" rel="noopener">ст. 113 п. 4</a></p>
-          </li>
-          <li>
-            <h3>Компенсацию за неиспользованный отпуск</h3>
-            <p>Если вы не отгуляли отпуск полностью, выплачивается компенсация. Она считается из средней заработной платы. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z96" target="_blank" rel="noopener">ст. 96 п. 2</a></p>
-          </li>
-          <li>
-            <h3>Документ о трудовой деятельности</h3>
-            <p>Выдаётся в день прекращения трудового договора. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z62" target="_blank" rel="noopener">ст. 62 п. 1</a></p>
-          </li>
-          <li>
-            <h3>Копию приказа об увольнении</h3>
-            <p>Вручают или отправляют заказным письмом в течение трёх рабочих дней со дня издания приказа. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z61" target="_blank" rel="noopener">ст. 61 п. 3</a></p>
-          </li>
-          <li>
-            <h3>Справку с места работы — по запросу</h3>
-            <p>С должностью, временем работы и размером зарплаты — в течение пяти рабочих дней после обращения. <a class="ref" href="https://adilet.zan.kz/rus/docs/K1500000414#z62" target="_blank" rel="noopener">ст. 62 п. 2</a></p>
-          </li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- 5. Источники и оговорка -->
+    <!-- 4. Источники и оговорка -->
     <section id="sources" class="section">
       <div class="wrap">
         <h2>Источники и оговорка</h2>
-        <div class="disclaimer" role="note">
+        <div class="disclaimer glass" role="note">
           <p><strong>Это справочная информация, а не юридическая консультация.</strong> Сайт не учитывает условия вашего договора, графика работы и особые ситуации. В спорном случае обратитесь к юристу или в инспекцию труда.</p>
-          <p>Содержание проверено на <time datetime="2026-11-05">5 ноября 2026 года</time>.</p>
+          <p>Содержание проверено на <time datetime="2026-11-12">12 ноября 2026 года</time>.</p>
         </div>
-        <ol class="sources">
-          <li><a href="https://adilet.zan.kz/rus/docs/K1500000414" target="_blank" rel="noopener">Трудовой кодекс Республики Казахстан от 23.11.2015 № 414-V</a> — ст. 13, 56, 61, 62, 84, 85, 96, 113.</li>
+        <ol class="sources glass">
+          <li><a href="https://adilet.zan.kz/rus/docs/K1500000414" target="_blank" rel="noopener">Трудовой кодекс Республики Казахстан от 23.11.2015 № 414-V</a> — ст. 13, 56, 61, 62, 84, 85, 96, 113, 159, 160.</li>
           <li><a href="https://adilet.zan.kz/rus/docs/Z010000267_" target="_blank" rel="noopener">Закон РК «О праздниках в Республике Казахстан» от 13.12.2001 № 267</a> — ст. 2, 3, 5 (в ред. Закона от 11.06.2026 № 306-VIII: с 01.07.2026 День Конституции — 15 марта).</li>
           <li>Дата первого дня Курбан-айта в 2027 году (16 мая) — по календарю Духовного управления мусульман Казахстана; может сместиться на один день.</li>
         </ol>
         <p class="muted small">Тексты нормативных актов — ИПС «Әділет» Министерства юстиции РК. Ничего из введённого вами не сохраняется и никуда не отправляется: расчёт выполняется в вашем браузере.</p>
+      </div>
+    </section>
+
+    <!-- 5. Контакты -->
+    <section id="contacts" class="section">
+      <div class="wrap">
+        <h2>Контакты</h2>
+        <h3 class="sub sub--first">Куда обратиться, если нарушены трудовые права</h3>
+        <p class="small">Сведения проверены 12.11.2026, это официальные ресурсы.</p>
+        <ul class="contacts">
+          <li class="glass">
+            <h4>Единый контакт-центр <a class="tel" href="tel:1414">1414</a></h4>
+            <p>Бесплатно с любого оператора Казахстана. Консультации по госуслугам и обращениям в госорганы. <a href="https://egov.kz/cms/ru/articles/call_center" target="_blank" rel="noopener">Подробнее на egov.kz</a></p>
+          </li>
+          <li class="glass">
+            <h4><a href="https://eotinish.kz" target="_blank" rel="noopener">eOtinish</a></h4>
+            <p>Обращения и жалобы в госорганы, в том числе в инспекцию труда.</p>
+          </li>
+          <li class="glass">
+            <h4><a href="https://www.gov.kz/memleket/entities/enbek" target="_blank" rel="noopener">Министерство труда и социальной защиты населения РК</a></h4>
+            <p>Официальный сайт министерства.</p>
+          </li>
+          <li class="glass">
+            <h4><a href="https://egov.kz" target="_blank" rel="noopener">egov.kz</a></h4>
+            <p>Портал электронного правительства.</p>
+          </li>
+        </ul>
+
+        <h3 class="sub">О проекте</h3>
+        <p>Учебный проект по вайбкодингу. Код открыт: <a href="https://github.com/arystana2015-creator/last-day" target="_blank" rel="noopener">github.com/arystana2015-creator/last-day</a>.</p>
+        <p>Нашли ошибку — напишите через <a href="https://github.com/arystana2015-creator/last-day/issues" target="_blank" rel="noopener">GitHub Issues</a>.</p>
       </div>
     </section>
   </main>
@@ -186,7 +381,17 @@
     </div>
   </footer>
 
-  <script src="calc.js?v=4"></script>
-  <script src="app.js?v=4"></script>
+  <!-- Лайтбокс для скриншотов -->
+  <dialog id="lightbox" class="lb" aria-label="Скриншот">
+    <div class="lb__in">
+      <img id="lb-img" alt="">
+      <button class="lb__close" id="lb-close" type="button" aria-label="Закрыть">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </dialog>
+
+  <script src="calc.js?v=6"></script>
+  <script src="app.js?v=6"></script>
 </body>
 </html>

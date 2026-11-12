@@ -149,8 +149,94 @@
     };
   }
 
+  /**
+   * Режим «Когда подать»: самая поздняя дата подачи уведомления, при которой
+   * срок уведомления истекает не позже желаемого последнего дня.
+   * Срок окончания не убывает с датой подачи, поэтому идём назад от желаемой даты.
+   */
+  function latestNotice(lastDay, months, days) {
+    if (parse(lastDay) === null) return { ok: false, error: 'invalid-date' };
+    var probe = calculate(CALENDAR_FROM, months, days);
+    if (!probe.ok && probe.error !== 'after-calendar') return probe; // неверный срок
+    if (lastDay > CALENDAR_TO) return { ok: false, error: 'after-calendar' };
+    for (var d = lastDay; d >= CALENDAR_FROM; d = addDays(d, -1)) {
+      var r = calculate(d, months, days);
+      if (r.ok && r.noticeEnd <= lastDay) {
+        r.wantedLastDay = lastDay;
+        r.exact = r.noticeEnd === lastDay;
+        return r;
+      }
+    }
+    return { ok: false, error: 'before-calendar' };
+  }
+
+  /**
+   * Режим «Деньги и документы»: сроки от дня прекращения договора.
+   * ст. 62 п. 1 — документ в день прекращения; ст. 113 п. 4 — выплаты не позднее 3 рабочих дней;
+   * ст. 61 п. 3 — копия приказа в течение 3 рабочих дней со дня издания (считаем: приказ издан в день прекращения);
+   * ст. 62 п. 2 — справка в течение 5 рабочих дней с момента обращения.
+   */
+  function documents(terminationDate, requestDate) {
+    if (parse(terminationDate) === null) return { ok: false, error: 'invalid-date' };
+    requestDate = requestDate || terminationDate;
+    if (parse(requestDate) === null) return { ok: false, error: 'invalid-date' };
+    if (terminationDate < CALENDAR_FROM || requestDate < CALENDAR_FROM) return { ok: false, error: 'before-calendar' };
+    var payment = addWorkingDays(terminationDate, 3);
+    var orderCopy = addWorkingDays(terminationDate, 3);
+    var certificate = addWorkingDays(requestDate, 5);
+    var latest = [payment, orderCopy, certificate].sort()[2];
+    if (latest > CALENDAR_TO) return { ok: false, error: 'after-calendar' };
+    return {
+      ok: true,
+      terminationDate: terminationDate,
+      requestDate: requestDate,
+      workDocument: terminationDate,
+      paymentDeadline: payment,
+      orderCopyDeadline: orderCopy,
+      certificateDeadline: certificate,
+      terminationOnDayOff: dayOffReason(terminationDate)
+    };
+  }
+
+  function diffDays(fromIso, toIso) { return Math.round((parse(toIso) - parse(fromIso)) / DAY); }
+
+  /**
+   * Режим «Если не заплатили»: просрочка окончательного расчёта и срок обращения.
+   * ст. 113 п. 4 — крайний срок выплаты; ст. 160 пп. 2) — по «другим трудовым спорам» один год
+   * с того дня, когда работник узнал или должен был узнать о нарушении.
+   * Допущение: о нарушении работник узнаёт на следующий день после крайнего срока выплаты.
+   */
+  function unpaid(terminationDate, today) {
+    if (parse(terminationDate) === null || parse(today) === null) return { ok: false, error: 'invalid-date' };
+    if (terminationDate < CALENDAR_FROM) return { ok: false, error: 'before-calendar' };
+    var deadline = addWorkingDays(terminationDate, 3);
+    if (deadline > CALENDAR_TO) return { ok: false, error: 'after-calendar' };
+    var learnedOn = addDays(deadline, 1);
+    var nominal = addMonths(learnedOn, 12);                    // ст. 13 пп. 3–4: «год» = то же число через 12 месяцев
+    var inCalendar = nominal <= CALENDAR_TO;
+    var applyBy = inCalendar ? nextWorkingDayFrom(nominal) : nominal; // ст. 13 п. 5 — только пока есть календарь
+    var overdue = Math.max(0, diffDays(deadline, today));
+    return {
+      ok: true,
+      terminationDate: terminationDate,
+      today: today,
+      paymentDeadline: deadline,
+      overdueDays: overdue,
+      isOverdue: overdue > 0,
+      learnedOn: learnedOn,
+      applyByNominal: nominal,
+      applyBy: applyBy,
+      applyByShiftChecked: inCalendar,
+      applyMissed: today > applyBy
+    };
+  }
+
   var api = {
     calculate: calculate,
+    latestNotice: latestNotice,
+    documents: documents,
+    unpaid: unpaid,
+    diffDays: diffDays,
     addMonths: addMonths,
     isWorkingDay: isWorkingDay,
     dayOffReason: dayOffReason,
