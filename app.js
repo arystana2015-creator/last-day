@@ -377,7 +377,7 @@
     });
   }
   if ('IntersectionObserver' in window) {
-    var sections = ['calc', 'explain', 'how', 'sources', 'contacts'].map(function (id) { return document.getElementById(id); });
+    var sections = ['calc', 'explain', 'sources', 'contacts'].map(function (id) { return document.getElementById(id); });
     var spy = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) { if (en.isIntersecting) setActive(en.target.id); });
     }, { rootMargin: '-35% 0px -60% 0px' });
@@ -386,7 +386,7 @@
 
   /* ---------- Мягкое появление разделов при прокрутке ---------- */
   if ('IntersectionObserver' in window && !reduced()) {
-    var targets = document.querySelectorAll('#explain .wrap > *, #how .wrap > *, #sources .wrap > *, #contacts .wrap > *, .foot .wrap');
+    var targets = document.querySelectorAll('#explain .wrap > *, #sources .wrap > *, #contacts .wrap > *, .foot .wrap');
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {
         if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }

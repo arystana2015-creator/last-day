@@ -18,7 +18,7 @@
       } catch (e) {}
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=7">
+  <link rel="stylesheet" href="styles.css?v=8">
 </head>
 <body>
   <!-- Фоновые пятна под стеклом -->
@@ -31,7 +31,6 @@
       <nav class="nav" id="nav" aria-label="Разделы">
         <a href="#calc">Калькулятор</a>
         <a href="#explain">Разъяснения</a>
-        <a href="#how">Как сделан сайт</a>
         <a href="#sources">Источники</a>
         <a href="#contacts">Контакты</a>
       </nav>
@@ -266,60 +265,7 @@
       </div>
     </section>
 
-    <!-- 3. Как сделан сайт -->
-    <section id="how" class="section">
-      <div class="wrap wrap--wide">
-        <h2>Как сделан сайт</h2>
-        <p class="section__lead">Сайт сделан с помощью ИИ-инструмента Claude Code. Ниже — реальные запросы автора по этапам: что просили, что сделал ИИ, что проверили вручную.</p>
-
-        <div class="cards" tabindex="0" role="region" aria-label="Этапы работы над сайтом — лента карточек">
-          <article class="pcard glass">
-            <p class="pcard__n">Этап 1</p>
-            <h3>План проекта</h3>
-            <blockquote class="term"><span class="term__bar" aria-hidden="true"><i></i><i></i><i></i></span><p><span class="term__gt" aria-hidden="true">&gt;</span>Вот мой документ с заданием. Пойми, что требуется, построй полный план, раздели на этапы, как в документе, и выполни только то, что нужно сейчас. Используй Sonnet на высоком уровне рассуждений, потом сам проверь</p></blockquote>
-            <dl class="steps"><div><dt>ИИ сделал</dt><dd>план, 3 варианта темы, паспорт проекта.</dd></div><div><dt>Проверили</dt><dd>нормы ТК РК по первоисточнику на adilet.zan.kz.</dd></div></dl>
-          </article>
-          <article class="pcard glass">
-            <p class="pcard__n">Этап 2</p>
-            <h3>Вопросы</h3>
-            <blockquote class="term"><span class="term__bar" aria-hidden="true"><i></i><i></i><i></i></span><p><span class="term__gt" aria-hidden="true">&gt;</span>Делаем калькулятор. Задай вопросы, чтобы понять мои идеи, и наводящие вопросы</p></blockquote>
-            <dl class="steps"><div><dt>ИИ сделал</dt><dd>анкету из 29 вопросов.</dd></div><div><dt>Проверили</dt><dd>полноту вопросов.</dd></div></dl>
-          </article>
-          <article class="pcard glass">
-            <p class="pcard__n">Этап 3</p>
-            <h3>Сборка калькулятора</h3>
-            <blockquote class="term"><span class="term__bar" aria-hidden="true"><i></i><i></i><i></i></span><p><span class="term__gt" aria-hidden="true">&gt;</span>Давай без вопросов — сделай по калькулятору то, что нужно, сам</p></blockquote>
-            <dl class="steps"><div><dt>ИИ сделал</dt><dd>ТЗ, логику расчёта, сайт, автотесты.</dd></div><div><dt>Проверили</dt><dd>12 тестовых примеров вручную; найдено изменение закона о праздниках 2026 года.</dd></div></dl>
-          </article>
-          <article class="pcard glass">
-            <p class="pcard__n">Этап 4</p>
-            <h3>Дизайн</h3>
-            <blockquote class="term"><span class="term__bar" aria-hidden="true"><i></i><i></i><i></i></span><p><span class="term__gt" aria-hidden="true">&gt;</span>Сделай сайт менее похожим на сделанный ИИ, сбалансированные цвета, и люксовую версию в стиле Liquid Glass — спокойно, без ярких цветов</p></blockquote>
-            <dl class="steps"><div><dt>ИИ сделал</dt><dd>две версии оформления.</dd></div><div><dt>Проверили</dt><dd>контраст текста, тёмную тему, телефон.</dd></div></dl>
-          </article>
-          <article class="pcard glass">
-            <p class="pcard__n">Этап 5</p>
-            <h3>Свой срок</h3>
-            <blockquote class="term"><span class="term__bar" aria-hidden="true"><i></i><i></i><i></i></span><p><span class="term__gt" aria-hidden="true">&gt;</span>По договору срок может быть больше или нестандартным — дай возможность самому вписать месяцы и дни</p></blockquote>
-            <dl class="steps"><div><dt>ИИ сделал</dt><dd>поля «месяцев» и «дней», проверку «не меньше месяца».</dd></div><div><dt>Проверили</dt><dd>новые автотесты.</dd></div></dl>
-          </article>
-          <article class="pcard glass">
-            <p class="pcard__n">Этап 6</p>
-            <h3>Кнопки и один дизайн</h3>
-            <blockquote class="term"><span class="term__bar" aria-hidden="true"><i></i><i></i><i></i></span><p><span class="term__gt" aria-hidden="true">&gt;</span>Нужен только один дизайн — Liquid Glass. И выбор срока кнопками или ввод своего</p></blockquote>
-            <dl class="steps"><div><dt>ИИ сделал</dt><dd>кнопки 1/2/3 месяца и «Свой срок».</dd></div><div><dt>Проверили</dt><dd>работу на опубликованном сайте.</dd></div></dl>
-          </article>
-          <article class="pcard glass">
-            <p class="pcard__n">Этап 7</p>
-            <h3>Версия 2</h3>
-            <blockquote class="term"><span class="term__bar" aria-hidden="true"><i></i><i></i><i></i></span><p><span class="term__gt" aria-hidden="true">&gt;</span>Добавь тёмную/светлую тему, скрины промптов, контакты, motion-дизайн и другие расчёты по датам с плавным переключением. Сначала концепцию</p></blockquote>
-            <dl class="steps"><div><dt>ИИ сделал</dt><dd>концепцию, 4 режима калькулятора, анимации.</dd></div><div><dt>Проверили</dt><dd>нормы ст. 159–160 ТК РК, 38 автотестов.</dd></div></dl>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- 4. Источники и оговорка -->
+    <!-- 3. Источники и оговорка -->
     <section id="sources" class="section">
       <div class="wrap">
         <h2>Источники и оговорка</h2>
@@ -336,7 +282,7 @@
       </div>
     </section>
 
-    <!-- 5. Контакты -->
+    <!-- 4. Контакты -->
     <section id="contacts" class="section">
       <div class="wrap">
         <h2>Контакты</h2>
@@ -374,7 +320,7 @@
     </div>
   </footer>
 
-  <script src="calc.js?v=7"></script>
-  <script src="app.js?v=7"></script>
+  <script src="calc.js?v=8"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>
