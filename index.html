@@ -18,13 +18,14 @@
       } catch (e) {}
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=8">
+  <link rel="stylesheet" href="styles.css?v=9">
 </head>
 <body>
   <!-- Фоновые пятна под стеклом -->
   <div class="bg" aria-hidden="true"><i class="blob blob--1"></i><i class="blob blob--2"></i><i class="blob blob--3"></i><i class="blob blob--4"></i></div>
   <a class="skip" href="#calc">К калькулятору</a>
 
+  <div class="reading-progress" aria-hidden="true"></div>
   <header class="top">
     <div class="top__inner">
       <a class="logo" href="#calc" aria-label="Последний день — в начало">Последний день</a>
@@ -47,9 +48,12 @@
     <!-- 1. Калькулятор -->
     <section id="calc" class="hero">
       <div class="wrap">
-        <h1>Когда ваш последний день и&nbsp;когда должны рассчитаться</h1>
+        <div class="hero-intro">
+          <h1>Когда ваш последний день и&nbsp;когда должны рассчитаться</h1>
         <p class="lead">Увольнение по собственному желанию в Казахстане. Выберите, что посчитать, — калькулятор применит сроки Трудового кодекса РК.</p>
 
+        </div>
+        <div class="calc-lift">
         <div class="calc glass">
           <p class="calc__title" id="calc-title">Что посчитать</p>
           <div class="tabs" role="tablist" aria-labelledby="calc-title" id="tabs">
@@ -158,6 +162,7 @@
           </div>
         </div>
 
+        </div>
         <p class="assume">
           <strong>Считаем для пятидневки</strong> (выходные — суббота и воскресенье) с праздниками РК.
           Переносы выходных, которые отдельно утверждает госорган по труду, не учтены — сверьтесь с производственным календарём.
@@ -169,6 +174,18 @@
     <section id="explain" class="section">
       <div class="wrap">
         <h2>Разъяснения</h2>
+
+        <div class="deadlines">
+          <div class="deadlines__pin glass">
+            <h3>Три срока, которые важно знать</h3>
+            <ol class="deadlines__steps">
+              <li><strong>1 <span>месяц</span></strong><p>предупредить работодателя</p></li>
+              <li><strong>3 <span>рабочих дня</span></strong><p>получить расчёт</p></li>
+              <li><strong>1 <span>год</span></strong><p>обратиться, если не заплатили</p></li>
+            </ol>
+            <div class="deadlines__track" aria-hidden="true"><i></i></div>
+          </div>
+        </div>
 
         <details class="fold glass" open>
           <summary>Как считается срок</summary>
@@ -320,7 +337,7 @@
     </div>
   </footer>
 
-  <script src="calc.js?v=8"></script>
-  <script src="app.js?v=8"></script>
+  <script src="calc.js?v=9"></script>
+  <script src="app.js?v=9"></script>
 </body>
 </html>

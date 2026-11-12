@@ -8,8 +8,6 @@
 
   var MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
   var WEEKDAYS = ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'];
-  var reduceMq = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
-  function reduced() { return reduceMq.matches; }
 
   /* ---------- Форматирование ---------- */
   function fmt(iso, withWeekday) {
@@ -260,7 +258,7 @@
   var tabEls = order.map(function (k) { return document.getElementById('tab-' + k); });
   var tablist = document.getElementById('tabs');
   var pill = document.getElementById('pill');
-  var cur = 0, token = 0;
+  var cur = 0;
 
   // Пилюля переезжает под выбранную вкладку: позиция и размер — из реальных размеров кнопки
   function placePill(instant) {
@@ -277,28 +275,16 @@
     if (idx === cur) { if (focus) tabEls[idx].focus(); return; }
     var oldPanel = panel(order[cur]);
     var newPanel = panel(order[idx]);
+    newPanel.style.setProperty('--slide', idx > cur ? '14px' : '-14px');
     cur = idx;
-    var my = ++token;
     tabEls.forEach(function (t, i) {
       t.setAttribute('aria-selected', i === idx ? 'true' : 'false');
       t.tabIndex = i === idx ? 0 : -1;
     });
     placePill(false);
     if (focus) tabEls[idx].focus();
-    // Убираем всё лишнее, что могло остаться от быстрых переключений
-    order.forEach(function (k) {
-      var p = panel(k);
-      if (p !== oldPanel && p !== newPanel) { p.hidden = true; p.classList.remove('is-leaving'); }
-    });
-    if (reduced()) { oldPanel.hidden = true; oldPanel.classList.remove('is-leaving'); newPanel.hidden = false; return; }
-    oldPanel.classList.add('is-leaving');
-    newPanel.hidden = true;
-    setTimeout(function () {
-      if (my !== token) return;
-      oldPanel.hidden = true;
-      oldPanel.classList.remove('is-leaving');
-      newPanel.hidden = false;
-    }, 200);
+    oldPanel.hidden = true;
+    newPanel.hidden = false;
   }
 
   tabEls.forEach(function (t, i) { t.addEventListener('click', function () { selectTab(i, false); }); });
@@ -351,14 +337,8 @@
     themeBtn.setAttribute('aria-label', 'Тема оформления: ' + NAMES[theme] + '. Переключить на: ' + NAMES[next]);
     themeBtn.title = 'Тема: ' + NAMES[theme];
   }
-  var fadeTimer;
   themeBtn.addEventListener('click', function () {
     theme = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
-    if (!reduced()) {
-      root.classList.add('theme-fade');
-      clearTimeout(fadeTimer);
-      fadeTimer = setTimeout(function () { root.classList.remove('theme-fade'); }, 420);
-    }
     applyTheme();
     try { if (theme === 'auto') localStorage.removeItem('ld-theme'); else localStorage.setItem('ld-theme', theme); } catch (e) {}
   });
@@ -384,14 +364,165 @@
     sections.forEach(function (s) { spy.observe(s); });
   }
 
-  /* ---------- Мягкое появление разделов при прокрутке ---------- */
-  if ('IntersectionObserver' in window && !reduced()) {
-    var targets = document.querySelectorAll('#explain .wrap > *, #sources .wrap > *, #contacts .wrap > *, .foot .wrap');
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+})();
+
+/* Декоративный слой. Калькулятор работает независимо от поддержки эффектов. */
+(() => {
+  'use strict';
+  const root = document.documentElement;
+  const motion = matchMedia('(prefers-reduced-motion: no-preference)');
+  const mouse = matchMedia('(hover: hover) and (pointer: fine)');
+  const nativeScroll = window.CSS && CSS.supports('animation-timeline: view()') &&
+    CSS.supports('animation-range: contain') && CSS.supports('view-timeline-inset: 10px 10px');
+  const intro = document.querySelector('.hero-intro');
+  const lift = document.querySelector('.calc-lift');
+  const progress = document.querySelector('.reading-progress');
+  const background = document.querySelector('.bg');
+  const story = document.querySelector('.deadlines');
+  const pin = story.querySelector('.deadlines__pin');
+  const surfaces = [...document.querySelectorAll('.glass:not(.deadlines__pin)')];
+  const headings = [...document.querySelectorAll('main h1, main h2, .deadlines__pin h3')];
+  const lists = document.querySelectorAll('.rules, .examples, .cases, .docs, ol.sources');
+  const clamp = value => Math.max(0, Math.min(1, value));
+  const listen = (query, fn) => {
+    if (query.addEventListener) query.addEventListener('change', fn);
+    else query.addListener(fn);
+  };
+  let observer;
+  let resizeObserver;
+  let frame = 0;
+
+  // Сохраняем исходные пробелы и одно связное имя заголовка для экранного диктора.
+  headings.forEach(heading => {
+    const original = heading.textContent;
+    const fragment = document.createDocumentFragment();
+    let index = 0;
+    original.split(/( +)/).forEach(part => {
+      if (!part.trim()) { fragment.append(part); return; }
+      const mask = document.createElement('span');
+      mask.className = 'word-mask';
+      mask.setAttribute('aria-hidden', 'true');
+      const word = document.createElement('span');
+      word.style.setProperty('--word', index++);
+      word.textContent = part;
+      mask.append(word);
+      fragment.append(mask);
+    });
+    heading.setAttribute('aria-label', original);
+    heading.replaceChildren(fragment);
+  });
+
+  function observeEntries() {
+    if (!('IntersectionObserver' in window)) return;
+    observer = new IntersectionObserver(entries => {
+      entries.forEach(({target, isIntersecting}) => {
+        if (!isIntersecting) return;
+        target.classList.add(target.hasAttribute('data-list-entry') ? 'list-entry' : 'is-entering');
+        observer.unobserve(target);
       });
-    }, { rootMargin: '0px 0px -8% 0px' });
-    Array.prototype.forEach.call(targets, function (el) { el.classList.add('reveal'); io.observe(el); });
+    });
+    headings.concat(pin).forEach(el => observer.observe(el));
+    surfaces.filter(el => !el.classList.contains('calc')).forEach(el => {
+      el.classList.add('surface-entry');
+      if (!nativeScroll) observer.observe(el);
+    });
+    lists.forEach(list => [...list.children].forEach((item, index) => {
+      item.setAttribute('data-list-entry', '');
+      item.style.setProperty('--order', index);
+      observer.observe(item);
+    }));
   }
+
+  function updateScroll() {
+    frame = 0;
+    const y = window.scrollY;
+    const remaining = root.scrollHeight - root.clientHeight;
+    const top = story.getBoundingClientRect().top;
+    const distance = story.offsetHeight - pin.offsetHeight;
+    const inset = parseFloat(getComputedStyle(pin).top) || 0;
+    const overall = remaining > 0 ? clamp(y / remaining) : 0;
+    const hero = clamp(y / 340);
+    progress.style.setProperty('--phase', overall);
+    background.style.setProperty('--phase', overall);
+    intro.style.setProperty('--phase', hero);
+    lift.style.setProperty('--phase', hero);
+    story.style.setProperty('--story', distance > 0 ? clamp((inset - top) / distance) : 0);
+  }
+  function scheduleScroll() {
+    if (!frame) frame = requestAnimationFrame(updateScroll);
+  }
+  function applyMotion() {
+    root.classList.remove('motion', 'motion-native', 'motion-fallback');
+    if (observer) observer.disconnect();
+    if (resizeObserver) resizeObserver.disconnect();
+    window.removeEventListener('scroll', scheduleScroll);
+    window.removeEventListener('resize', scheduleScroll);
+    cancelAnimationFrame(frame);
+    frame = 0;
+    document.querySelectorAll('.is-entering, .list-entry').forEach(el => el.classList.remove('is-entering', 'list-entry'));
+    if (!motion.matches) return;
+    root.classList.add('motion', nativeScroll ? 'motion-native' : 'motion-fallback');
+    observeEntries();
+    if (nativeScroll) return;
+    window.addEventListener('scroll', scheduleScroll, { passive: true });
+    window.addEventListener('resize', scheduleScroll);
+    if ('ResizeObserver' in window) {
+      resizeObserver = new ResizeObserver(scheduleScroll);
+      resizeObserver.observe(document.body);
+      resizeObserver.observe(story);
+    }
+    scheduleScroll();
+  }
+
+  // Для длинной раскрытой панели уменьшаем угол, чтобы текст под мышью не уезжал.
+  let tracked = null, pointerFrame = 0, clientX = 0, clientY = 0;
+  function resetPointer() {
+    cancelAnimationFrame(pointerFrame);
+    pointerFrame = 0;
+    if (tracked) {
+      tracked.classList.remove('tracking');
+      tracked.style.removeProperty('--surface');
+      tracked = null;
+    }
+  }
+  function drawPointer() {
+    pointerFrame = 0;
+    if (!tracked) return;
+    const box = tracked.getBoundingClientRect();
+    const x = clamp((clientX - box.left) / box.width);
+    const y = clamp((clientY - box.top) / box.height);
+    const angle = Math.min(2.2, 550 / Math.max(box.height, box.width));
+    const pull = tracked.matches('.contacts li') ? 5 : 0;
+    const dx = 2 * x - 1, dy = 2 * y - 1;
+    tracked.style.setProperty('--surface', 'perspective(1200px) translate(' + (pull * dx) + 'px,' +
+      (pull * dy) + 'px) rotateX(' + (-angle * dy) + 'deg) rotateY(' + (angle * dx) + 'deg)');
+    tracked.style.setProperty('--light-x', x * box.width + 'px');
+    tracked.style.setProperty('--light-y', y * box.height + 'px');
+    tracked.classList.add('tracking');
+  }
+  function movePointer(event) {
+    if (event.pointerType !== 'mouse') { resetPointer(); return; }
+    if (tracked !== event.currentTarget) resetPointer();
+    tracked = event.currentTarget;
+    clientX = event.clientX;
+    clientY = event.clientY;
+    if (!pointerFrame) pointerFrame = requestAnimationFrame(drawPointer);
+  }
+  function applyPointer() {
+    resetPointer();
+    const enabled = motion.matches && mouse.matches;
+    surfaces.forEach(el => {
+      el.classList.toggle('pointer-surface', enabled);
+      el.removeEventListener('pointermove', movePointer);
+      el.removeEventListener('pointerleave', resetPointer);
+      if (enabled) {
+        el.addEventListener('pointermove', movePointer, { passive: true });
+        el.addEventListener('pointerleave', resetPointer);
+      }
+    });
+  }
+  applyMotion();
+  applyPointer();
+  listen(motion, () => { applyMotion(); applyPointer(); });
+  listen(mouse, applyPointer);
 })();
